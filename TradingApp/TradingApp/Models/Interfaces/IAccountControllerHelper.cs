@@ -13,4 +13,11 @@ public interface IAccountControllerHelper
     /// </summary>
     /// <returns>List of accounts and their information</returns>
     Task<Result<List<AccountDto>>> GetAccountsAsync();
+
+    /// <summary>
+    /// Retrieves an account if it exists
+    /// </summary>
+    /// <param name="id">AccountId</param>
+    /// <returns>Account details</returns>
+    Task<Result<AccountDto?>> GetAccountAsync(int id);
 }

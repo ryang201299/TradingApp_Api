@@ -21,4 +21,10 @@ public class AccountControllerHelper : IAccountControllerHelper
     {
         return await _accountService.GetAccountsAsync();
     }
+
+    /// <inheritdoc />
+    public async Task<Result<AccountDto?>> GetAccountAsync(int id)
+    {
+        return await _accountService.GetAccountAsync(id);
+    }
 }

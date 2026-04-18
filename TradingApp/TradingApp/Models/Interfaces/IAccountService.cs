@@ -12,4 +12,11 @@ public interface IAccountService
     /// </summary>
     /// <returns>List of accounts and their information</returns>
     Task<Result<List<AccountDto>>> GetAccountsAsync();
+
+    /// <summary>
+    /// Retrieves information about an account
+    /// </summary>
+    /// <param name="id">Account Id</param>
+    /// <returns>Information about an account</returns>
+    Task<Result<AccountDto?>> GetAccountAsync(int id);
 }
