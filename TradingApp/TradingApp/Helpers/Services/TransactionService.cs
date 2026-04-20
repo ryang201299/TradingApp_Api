@@ -83,7 +83,7 @@ public class TransactionService : ITransactionService
                 transaction.Security.SecurityId,
                 transaction.TransactionType.TransactionTypeId);
 
-            _context.Transactions.Remove(transaction);
+            _context.Transactions.Add(transaction);
             await _context.SaveChangesAsync();
 
             return Result.Success();
