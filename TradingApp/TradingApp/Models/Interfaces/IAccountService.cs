@@ -1,4 +1,4 @@
-﻿using TradingApp.Models.DTO;
+﻿using TradingApp.Models.Database;
 
 namespace TradingApp.Models.Interfaces;
 
@@ -11,12 +11,14 @@ public interface IAccountService
     /// Retrieves all accounts
     /// </summary>
     /// <returns>List of accounts and their information</returns>
-    Task<Result<List<AccountDto>>> GetAccountsAsync();
+    Task<Result<List<Account>>> GetAccountsAsync();
 
     /// <summary>
     /// Retrieves information about an account
     /// </summary>
     /// <param name="id">Account Id</param>
     /// <returns>Information about an account</returns>
-    Task<Result<AccountDto?>> GetAccountAsync(int id);
+    Task<Result<Account?>> GetAccountAsync(int id);
+
+    Task<Result<int?>> GetAccountIdAsync(string accountName);
 }

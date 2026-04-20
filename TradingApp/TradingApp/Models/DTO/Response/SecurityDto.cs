@@ -1,12 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace TradingApp.Models.Database;
+namespace TradingApp.Models.DTO.Response;
 
-public class Security
+public class SecurityDto
 {
-    [Key]
+    [Required]
     public int SecurityId { get; set; }
 
-    [MaxLength(50)]
+    [Required]
     public required string SecurityName { get; set; }
 }

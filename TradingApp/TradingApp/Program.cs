@@ -3,6 +3,7 @@ using TradingApp.Data;
 using TradingApp.Helpers.Controllers;
 using TradingApp.Helpers.Services;
 using TradingApp.Models.Interfaces;
+using TradingApp.Models.Interfaces.ControllerHelpers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,9 +17,16 @@ builder.Services.AddDbContext<TradingAppContext>(options =>
 
 // Helpers
 builder.Services.AddScoped<IAccountControllerHelper, AccountControllerHelper>();
+builder.Services.AddScoped<ISecurityControllerHelper, SecurityControllerHelper>();
+builder.Services.AddScoped<ITransactionControllerHelper, TransactionControllerHelper>();
+builder.Services.AddScoped<ISecurityPricesControllerHelper, SecurityPricesControllerHelper>();
 
 // Services
 builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<ISecurityService, SecurityService>();
+builder.Services.AddScoped<ITransactionService, TransactionService>();
+builder.Services.AddScoped<ITransactionTypeService, TransactionTypeService>();
+builder.Services.AddScoped<ISecurityPriceService, SecurityPriceService>();
 
 var app = builder.Build();
 

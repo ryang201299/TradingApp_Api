@@ -2,6 +2,7 @@
 using TradingApp.Models.Database;
 
 namespace TradingApp.Data;
+
 public class TradingAppContext : DbContext
 {
     public DbSet<Account> Accounts { get; set; }

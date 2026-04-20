@@ -1,6 +1,6 @@
-﻿using TradingApp.Models.Interfaces;
-using TradingApp.Models.DTO;
-using TradingApp.Models;
+﻿using TradingApp.Models;
+using TradingApp.Models.Database;
+using TradingApp.Models.Interfaces;
 
 namespace TradingApp.Helpers.Controllers;
 
@@ -17,14 +17,19 @@ public class AccountControllerHelper : IAccountControllerHelper
     }
 
     /// <inheritdoc />
-    public async Task<Result<List<AccountDto>>> GetAccountsAsync()
+    public async Task<Result<List<Account>>> GetAccountsAsync()
     {
         return await _accountService.GetAccountsAsync();
     }
 
     /// <inheritdoc />
-    public async Task<Result<AccountDto?>> GetAccountAsync(int id)
+    public async Task<Result<Account?>> GetAccountAsync(int id)
     {
         return await _accountService.GetAccountAsync(id);
+    }
+
+    public async Task<Result<int?>> GetAccountIdAsync(string name)
+    {
+        return await _accountService.GetAccountIdAsync(name);
     }
 }

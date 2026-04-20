@@ -22,7 +22,7 @@ public class Result<T>
     public string? Error { get; set; }
 
     private Result(bool isSuccess, T? value, string? error)
-    { 
+    {
         IsSuccess = isSuccess;
         Value = value;
         Error = error;
@@ -41,4 +41,21 @@ public class Result<T>
     /// <param name="error">Error message</param>
     /// <returns>Unsuccessful result object</returns>
     public static Result<T> Failure(string error) => new Result<T>(false, default, error);
+}
+
+public class Result
+{
+    public bool IsSuccess { get; set; }
+
+    public string? Error { get; set; }
+
+    private Result(bool isSuccess, string? error)
+    {
+        IsSuccess = isSuccess;
+        Error = error;
+    }
+
+    public static Result Success() => new Result(true, null);
+
+    public static Result Failure(string error) => new Result(false, error);
 }

@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TradingApp.Models.Database;
+
 public class SecurityPrice
 {
     [Key, ForeignKey(nameof(Security))]

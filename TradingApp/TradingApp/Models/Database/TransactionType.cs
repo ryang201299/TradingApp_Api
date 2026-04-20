@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
 namespace TradingApp.Models.Database;
+
 public class TransactionType
 {
     [Key]

@@ -10,5 +10,5 @@ public class Account
     [MaxLength(50)]
     public required string Name { get; set; }
 
-    public ICollection<Transaction>? Transactions { get; set; } 
+    public ICollection<Transaction>? Transactions { get; set; }
 }
