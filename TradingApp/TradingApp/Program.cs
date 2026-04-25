@@ -21,6 +21,7 @@ builder.Services.AddScoped<ISecurityControllerHelper, SecurityControllerHelper>(
 builder.Services.AddScoped<ITransactionControllerHelper, TransactionControllerHelper>();
 builder.Services.AddScoped<ISecurityPricesControllerHelper, SecurityPricesControllerHelper>();
 builder.Services.AddScoped<IHoldingsControllerHelper, HoldingsControllerHelper>();
+builder.Services.AddScoped<IPerformanceControllerHelper, PerformanceControllerHelper>();
 
 // Services
 builder.Services.AddScoped<IAccountService, AccountService>();
