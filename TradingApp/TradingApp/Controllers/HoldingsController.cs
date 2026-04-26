@@ -83,7 +83,7 @@ public class HoldingsController : ControllerBase
     /// </summary>
     /// <returns>Total holdings for an accounts</returns>
     [HttpGet("{id:int}")]
-    [ProducesResponseType(typeof(HoldingsPerAccountDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(AccountHoldingsDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetHoldingsForAccount(int id)
     {
         try

@@ -308,7 +308,7 @@ public class PerformanceControllerHelper : IPerformanceControllerHelper
         AccountUnrealisedReturns unrealisedReturns = new()
         {
             Account = shareWorthResult.Value!.Account,
-            UnrealisedReturns = ((shareWorthResult.Value.ShareWorth - shareCostResult.Value!.ShareCost) / shareCostResult.Value!.ShareCost) * 100
+            UnrealisedReturns = Math.Round(((shareWorthResult.Value.ShareWorth - shareCostResult.Value!.ShareCost) / shareCostResult.Value!.ShareCost) * 100, 2)
         };
 
         return Result<AccountUnrealisedReturns>.Success(unrealisedReturns);
