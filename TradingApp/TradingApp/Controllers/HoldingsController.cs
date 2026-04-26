@@ -22,13 +22,13 @@ public class HoldingsController : ControllerBase
     /// Gets total holdings for all accounts
     /// </summary>
     /// <returns>Total holdings for all accounts</returns>
-    [HttpGet]
+    [HttpGet("overall")]
     [ProducesResponseType(typeof(List<HoldingsPerAccountDto>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetHoldings()
+    public async Task<IActionResult> GetOverallHoldings()
     {
         try
         {
-            Result<List<HoldingsPerAccount>> holdingsResult = await _holdingsHelper.GetHoldingsAsync();
+            Result<List<AccountHolding>> holdingsResult = await _holdingsHelper.GetOverallHoldingsForAllAccountsAsync();
 
             if (!holdingsResult.IsSuccess)
             {
@@ -40,6 +40,71 @@ public class HoldingsController : ControllerBase
                 Account = new AccountDto() { AccountId = x.Account.AccountId, Name = x.Account.Name, Cash = x.Account.Cash },
                 Holding = x.Holding,
             }).ToList());
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred retrieving holdings.");
+            return BadRequest(ex.Message);
+        }
+    }
+
+    /// <summary>
+    /// Gets total holdings for an account
+    /// </summary>
+    /// <returns>Total holdings for an accounts</returns>
+    [HttpGet("overall/{id:int}")]
+    [ProducesResponseType(typeof(HoldingsPerAccountDto), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetOverallHoldingsForAccount(int id)
+    {
+        try
+        {
+            Result<AccountHolding> holdingsResult = await _holdingsHelper.GetOverallHoldingsForAnAccountAsync(id);
+
+            if (!holdingsResult.IsSuccess)
+            {
+                return BadRequest(holdingsResult.Error);
+            }
+
+            return Ok(new HoldingsPerAccountDto()
+            {
+                Account = new AccountDto() { AccountId = holdingsResult.Value!.Account.AccountId, Name = holdingsResult.Value.Account.Name, Cash = holdingsResult.Value.Account.Cash },
+                Holding = holdingsResult.Value.Holding
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred retrieving holdings.");
+            return BadRequest(ex.Message);
+        }
+    }
+
+    /// <summary>
+    /// Gets total holdings for an account
+    /// </summary>
+    /// <returns>Total holdings for an accounts</returns>
+    [HttpGet("{id:int}")]
+    [ProducesResponseType(typeof(HoldingsPerAccountDto), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetHoldingsForAccount(int id)
+    {
+        try
+        {
+            Result<AccountHoldings> holdingsResult = await _holdingsHelper.GetHoldingsForAnAccountAsync(id);
+
+            if (!holdingsResult.IsSuccess)
+            {
+                return BadRequest(holdingsResult.Error);
+            }
+
+            return Ok(new AccountHoldingsDto() 
+            { 
+                Account = new AccountDto() 
+                { 
+                    AccountId = holdingsResult.Value!.Account.AccountId,
+                    Name = holdingsResult.Value.Account.Name,
+                    Cash = holdingsResult.Value.Account.Cash
+                },
+                Holdings = holdingsResult.Value.Holdings
+            });
         }
         catch (Exception ex)
         {

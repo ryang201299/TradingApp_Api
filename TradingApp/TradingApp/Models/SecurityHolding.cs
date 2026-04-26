@@ -1,9 +1,9 @@
 ﻿using TradingApp.Models.Database;
 
 namespace TradingApp.Models;
-
-public class HoldingsPerAccount
+public class SecurityHolding
 {
-    public required Account Account { get; set; }
+    public required Security Security { get; set; }
+
     public required decimal Holding { get; set; }
 }

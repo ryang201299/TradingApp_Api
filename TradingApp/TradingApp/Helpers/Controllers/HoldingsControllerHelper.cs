@@ -66,6 +66,44 @@ public class HoldingsControllerHelper : IHoldingsControllerHelper
         return Result<List<HoldingQuantity>>.Success(holdingQuantities);
     }
 
+    private async Task<Result<List<HoldingQuantity>>> GetHoldingQuantitiesForAnAccount(int accountId)
+    {
+        _logger.LogInformation("Retrieving overall holdings for all accounts.");
+
+        // Retrieving required data
+        Result<List<Transaction>> transactionsResult = await _transactionService.GetTransactionsAsync();
+
+        if (!transactionsResult.IsSuccess)
+        {
+            return Result<List<HoldingQuantity>>.Failure(transactionsResult.Error!);
+        }
+
+        List<Transaction> transactions = transactionsResult.Value!.Where(x => x.Account.AccountId == accountId).ToList();
+
+        var grouped = transactions
+            .GroupBy(x => new
+            {
+                x.Account,
+                x.Security
+            })
+            .Select(g => new
+            {
+                Account = g.Key.Account,
+                Security = g.Key.Security,
+                // Increment buys, decrement sells for total current held quantity
+                TotalQuantity = g.Sum(e => e.TransactionType.TransactionTypeId == 1 ? e.Quantity : -e.Quantity)
+            }).ToList();
+
+        List<HoldingQuantity> holdingQuantities = grouped.Select(x => new HoldingQuantity()
+        {
+            Account = x.Account,
+            Security = x.Security,
+            Quantity = x.TotalQuantity
+        }).ToList();
+
+        return Result<List<HoldingQuantity>>.Success(holdingQuantities);
+    }
+
     /// <summary>
     /// Helper method which retrieves the current value of holdings for all accounts
     /// </summary>
@@ -115,7 +153,7 @@ public class HoldingsControllerHelper : IHoldingsControllerHelper
     }
 
     /// <inheritdoc />
-    public async Task<Result<List<HoldingsPerAccount>>> GetHoldingsAsync()
+    public async Task<Result<List<AccountHolding>>> GetOverallHoldingsForAllAccountsAsync()
     {
         _logger.LogInformation("Retrieving holdings for all accounts.");
 
@@ -124,7 +162,7 @@ public class HoldingsControllerHelper : IHoldingsControllerHelper
 
         if (!holdingQuantitiesResult.IsSuccess)
         {
-            return Result<List<HoldingsPerAccount>>.Failure(holdingQuantitiesResult.Error!);
+            return Result<List<AccountHolding>>.Failure(holdingQuantitiesResult.Error!);
         }
         
         // Retrieve value of overall holdings
@@ -132,7 +170,7 @@ public class HoldingsControllerHelper : IHoldingsControllerHelper
 
         if (!holdingsValueResult.IsSuccess)
         {
-            return Result<List<HoldingsPerAccount>>.Failure(holdingsValueResult.Error!);
+            return Result<List<AccountHolding>>.Failure(holdingsValueResult.Error!);
         }
 
         // get accounts cash
@@ -140,16 +178,94 @@ public class HoldingsControllerHelper : IHoldingsControllerHelper
 
         if (!accountsResult.IsSuccess)
         { 
-            return Result<List<HoldingsPerAccount>>.Failure(accountsResult.Error!);
+            return Result<List<AccountHolding>>.Failure(accountsResult.Error!);
         }
 
         // group by account and sum of holdings
-        var accountHoldings = holdingsValueResult.Value!.GroupBy(x => x.Account).Select(g => new HoldingsPerAccount()
+        var accountHoldings = holdingsValueResult.Value!.GroupBy(x => x.Account).Select(g => new AccountHolding()
         { 
             Account = g.Key,
             Holding = g.Sum(e => e.Value) + accountsResult.Value!.Where(x => x.AccountId == g.Key.AccountId).Select(a => a.Cash).First()
         }).ToList();
 
-        return Result<List<HoldingsPerAccount>>.Success(accountHoldings);
+        return Result<List<AccountHolding>>.Success(accountHoldings);
+    }
+
+    /// <inheritdoc />
+    public async Task<Result<AccountHolding>> GetOverallHoldingsForAnAccountAsync(int accountId)
+    {
+        _logger.LogInformation("Retrieving holdings for all accounts.");
+
+        // Retrieve overall holdings for all accounts
+        Result<List<HoldingQuantity>> holdingQuantitiesResult = await GetHoldingQuantitiesForAnAccount(accountId);
+
+        if (!holdingQuantitiesResult.IsSuccess)
+        {
+            return Result<AccountHolding>.Failure(holdingQuantitiesResult.Error!);
+        }
+
+        // Retrieve value of overall holdings
+        Result<List<HoldingValue>> holdingsValueResult = await GetHoldingValue(holdingQuantitiesResult.Value!);
+
+        if (!holdingsValueResult.IsSuccess)
+        {
+            return Result<AccountHolding>.Failure(holdingsValueResult.Error!);
+        }
+
+        // get accounts cash
+        Result<Account> accountsResult = await _accountService.GetAccountAsync(accountId);
+
+        if (!accountsResult.IsSuccess)
+        {
+            return Result<AccountHolding>.Failure(accountsResult.Error!);
+        }
+
+        // group by account and sum of holdings
+        AccountHolding accountHoldings = holdingsValueResult.Value!.GroupBy(x => x.Account).Select(g => new AccountHolding()
+        {
+            Account = g.Key,
+            Holding = g.Sum(e => e.Value) + accountsResult.Value!.Cash
+        }).First();
+
+        return Result<AccountHolding>.Success(accountHoldings);
+    }
+
+    /// <inheritdoc />
+    public async Task<Result<AccountHoldings>> GetHoldingsForAnAccountAsync(int accountId)
+    {
+        _logger.LogInformation("Retrieving holdings for accounts `{AccountId}`.", accountId);
+
+        // Retrieve overall holdings for all accounts
+        Result<List<HoldingQuantity>> holdingQuantitiesResult = await GetHoldingQuantitiesForAnAccount(accountId);
+
+        if (!holdingQuantitiesResult.IsSuccess)
+        {
+            return Result<AccountHoldings>.Failure(holdingQuantitiesResult.Error!);
+        }
+
+        // Retrieve value of overall holdings
+        Result<List<HoldingValue>> holdingsValueResult = await GetHoldingValue(holdingQuantitiesResult.Value!);
+
+        if (!holdingsValueResult.IsSuccess)
+        {
+            return Result<AccountHoldings>.Failure(holdingsValueResult.Error!);
+        }
+
+        AccountHoldings accountHoldings = new()
+        {
+            Account = holdingsValueResult.Value!.Select(x => x.Account).First(),
+            Holdings = new()
+        };
+
+        foreach (HoldingValue holding in holdingsValueResult.Value!)
+        {
+            accountHoldings.Holdings.Add(new SecurityHolding()
+            {
+                Security = holding.Security,
+                Holding = holding.Value
+            });
+        }
+
+        return Result<AccountHoldings>.Success(accountHoldings);
     }
 }
