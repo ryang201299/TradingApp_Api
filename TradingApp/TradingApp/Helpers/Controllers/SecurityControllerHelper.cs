@@ -21,7 +21,7 @@ public class SecurityControllerHelper : ISecurityControllerHelper
         return await _securityService.GetSecuritiesAsync();
     }
 
-    public async Task<Result<int?>> GetSecurityIdAsync(string name)
+    public async Task<Result<int>> GetSecurityIdAsync(string name)
     {
         return await _securityService.GetSecurityIdAsync(name);
     }

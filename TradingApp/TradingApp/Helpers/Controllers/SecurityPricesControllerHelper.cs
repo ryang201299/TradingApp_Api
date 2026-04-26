@@ -14,6 +14,7 @@ public class SecurityPricesControllerHelper : ISecurityPricesControllerHelper
         _securityPriceService = securityPriceService;
     }
 
+    /// <inheritdoc />
     public async Task<Result<List<SecurityPrice>>> GetSecurityPricesAsync()
     {
         return await _securityPriceService.GetSecurityPricesAsync();

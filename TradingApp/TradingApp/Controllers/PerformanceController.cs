@@ -22,12 +22,17 @@ namespace TradingApp.Controllers
         {
             try
             {
-                List<AccountUnrealisedReturns> unrealisedReturns = await _performanceHelper.GetUnrealisedReturns();
+                Result<List<AccountUnrealisedReturns>> unrealisedReturns = await _performanceHelper.GetUnrealisedReturns();
 
-                return Ok(unrealisedReturns.Select(x => new UnrealisedReturnsDto()
+                if (!unrealisedReturns.IsSuccess)
+                {
+                    return BadRequest(unrealisedReturns.Error);
+                }
+
+                return Ok(unrealisedReturns.Value!.Select(x => new UnrealisedReturnsDto()
                 { 
                     Account = new AccountDto() { AccountId = x.Account.AccountId, Name = x.Account.Name, Cash = x.Account.Cash },
-                    UnrealisedReturns = Math.Round(x.UnrealisedReturns, 2)
+                    UnrealisedReturns = x.UnrealisedReturns
                 }).ToList());
             }
             catch (Exception ex)

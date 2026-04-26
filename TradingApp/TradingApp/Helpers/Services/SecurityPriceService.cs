@@ -17,6 +17,7 @@ public class SecurityPriceService : ISecurityPriceService
         _context = context;
     }
 
+    /// <inheritdoc />
     public async Task<Result<List<SecurityPrice>>> GetSecurityPricesAsync()
     {
         try
@@ -36,20 +37,27 @@ public class SecurityPriceService : ISecurityPriceService
         }
     }
 
-    public async Task<Result<SecurityPrice?>> GetSecurityPriceAsync(int securityId)
+    /// <inheritdoc />
+    public async Task<Result<SecurityPrice>> GetSecurityPriceAsync(int securityId)
     {
         try
         {
+            _logger.LogInformation("Retrieving latest price for security `{SecurityId}`.", securityId);
+
             SecurityPrice? securityPrice = await _context.SecurityPrices
                 .Where(x => x.SecurityId == securityId)
                 .FirstOrDefaultAsync();
 
-            return Result<SecurityPrice?>.Success(securityPrice);
+            _logger.LogInformation("Latest price is `{Price}`.", securityPrice);
+
+            if (securityPrice == null) { return Result<SecurityPrice>.Failure("No price found."); }
+
+            return Result<SecurityPrice>.Success(securityPrice);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to retrieve price for security `{SecurityId}`.", securityId);
-            return Result<SecurityPrice?>.Failure(ex.Message);
+            return Result<SecurityPrice>.Failure(ex.Message);
         }
     }
 }

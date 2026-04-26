@@ -18,15 +18,24 @@ public class HoldingsController : ControllerBase
         _holdingsHelper = holdingsHelper;
     }
 
+    /// <summary>
+    /// Gets total holdings for all accounts
+    /// </summary>
+    /// <returns>Total holdings for all accounts</returns>
     [HttpGet]
     [ProducesResponseType(typeof(List<HoldingsPerAccountDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetHoldings()
     {
         try
         {
-            List<HoldingsPerAccount> holdingsResult = await _holdingsHelper.GetHoldingsAsync();
+            Result<List<HoldingsPerAccount>> holdingsResult = await _holdingsHelper.GetHoldingsAsync();
 
-            return Ok(holdingsResult.Select(x => new HoldingsPerAccountDto()
+            if (!holdingsResult.IsSuccess)
+            {
+                return BadRequest(holdingsResult.Error);
+            }
+
+            return Ok(holdingsResult.Value!.Select(x => new HoldingsPerAccountDto()
             { 
                 Account = new AccountDto() { AccountId = x.Account.AccountId, Name = x.Account.Name, Cash = x.Account.Cash },
                 Holding = x.Holding,

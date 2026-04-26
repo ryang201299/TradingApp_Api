@@ -40,7 +40,7 @@ public class AccountService : IAccountService
     }
 
     /// <inheritdoc />
-    public async Task<Result<Account?>> GetAccountAsync(int id)
+    public async Task<Result<Account>> GetAccountAsync(int id)
     {
         try
         {
@@ -53,23 +53,23 @@ public class AccountService : IAccountService
             if (account == null)
             {
                 _logger.LogInformation("Account `{AccountId}` not found.", id);
-            }
-            else
-            {
-                _logger.LogInformation("Retrieved account id `{AccountId}` with name `{AccountName}`.", account.AccountId, account.Name);
+                return Result<Account>.Failure("Account no found.");
             }
 
-            return Result<Account?>.Success(account);
+            _logger.LogInformation("Retrieved account id `{AccountId}` with name `{AccountName}`.", account.AccountId, account.Name);
+
+            return Result<Account>.Success(account);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "An error occurred while retrieving account `{AccountId}`.", id);
 
-            return Result<Account?>.Failure(ex.Message);
+            return Result<Account>.Failure(ex.Message);
         }
     }
 
-    public async Task<Result<int?>> GetAccountIdAsync(string name)
+    /// <inheritdoc />
+    public async Task<Result<int>> GetAccountIdAsync(string name)
     {
         try
         {
@@ -82,39 +82,60 @@ public class AccountService : IAccountService
             if (accountId == null)
             {
                 _logger.LogInformation("Account `{AccountName}` not found.", name);
-            }
-            else
-            {
-                _logger.LogInformation("Retrieved account id `{AccountId}` given name `{AccountName}`", accountId, name);
+                return Result<int>.Failure("Account not found.");
             }
 
-            return Result<int?>.Success(accountId);
+            _logger.LogInformation("Retrieved account id `{AccountId}` given name `{AccountName}`", accountId, name);
+
+            return Result<int>.Success((int)accountId);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "An error occurred while retrieving account `{AccountName}`.", name);
 
-            return Result<int?>.Failure(ex.Message);
+            return Result<int>.Failure(ex.Message);
         }
     }
 
+    /// <inheritdoc />
     public async Task<Result> AddCashAsync(Account account, decimal cash)
     {
-        account.Cash += cash;
-        await _context.SaveChangesAsync();
+        try
+        {
+            _logger.LogInformation("Adding `{CashAmount}` cash to account `{AccountId}`.", cash, account.AccountId);
 
-        return Result.Success();
+            account.Cash += cash;
+            await _context.SaveChangesAsync();
+
+            return Result.Success();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to add cash to account.");
+            return Result.Failure(ex.Message);
+        }
     }
 
+    /// <inheritdoc />
     public async Task<Result> WidthdrawCashAsync(Account account, decimal cash)
     {
-        if (cash > account.Cash) 
+        try
         {
-            return Result.Failure("Insufficient cash to cover widthdrawal.");
+            _logger.LogInformation("Widthdrawing `{CashAmount}` from account `{AccountId}`.", cash, account.AccountId);
+
+            if (cash > account.Cash)
+            {
+                return Result.Failure("Insufficient cash to cover widthdrawal.");
+            }
+
+            account.Cash -= cash;
+
+            return Result.Success();
         }
-
-        account.Cash -= cash;
-
-        return Result.Success();
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to widthdraw cash from account.");
+            return Result.Failure(ex.Message);
+        }
     }
 }

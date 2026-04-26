@@ -19,7 +19,12 @@ public interface IAccountControllerHelper
     /// </summary>
     /// <param name="id">AccountId</param>
     /// <returns>Account details</returns>
-    Task<Result<Account?>> GetAccountAsync(int id);
+    Task<Result<Account>> GetAccountAsync(int id);
 
-    Task<Result<int?>> GetAccountIdAsync(string name);
+    /// <summary>
+    /// Retrieves an account id given an account name
+    /// </summary>
+    /// <param name="name">Name of an account</param>
+    /// <returns>Account Id</returns>
+    Task<Result<int>> GetAccountIdAsync(string name);
 }

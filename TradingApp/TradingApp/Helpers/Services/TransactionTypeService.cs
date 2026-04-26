@@ -17,20 +17,27 @@ public class TransactionTypeService : ITransactionTypeService
         _context = context;
     }
 
-    public async Task<Result<TransactionType?>> GetTransactionTypeAsync(TransactionTypeEnum transactionTypeEnum)
+    public async Task<Result<TransactionType>> GetTransactionTypeAsync(TransactionTypeEnum transactionTypeEnum)
     {
         try
         {
+            _logger.LogInformation("Retrieving transaction type `{TransactionType}`.", (int)transactionTypeEnum);
             TransactionType? transactionType = await _context.TransactionTypes
                 .Where(x => x.TransactionTypeId == (int)transactionTypeEnum)
                 .FirstOrDefaultAsync();
 
-            return Result<TransactionType?>.Success(transactionType);
+            if (transactionType == null)
+            {
+                _logger.LogError("Transaction type not found.");
+                return Result<TransactionType>.Failure("Transaction type not found.");
+            }
+
+            return Result<TransactionType>.Success(transactionType);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "An error occurred while retrieving transaction type `{TransactionTypeId}`.", (int)transactionTypeEnum);
-            return Result<TransactionType?>.Failure(ex.Message);
+            return Result<TransactionType>.Failure(ex.Message);
         }
     }
 }

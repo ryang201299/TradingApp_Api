@@ -6,7 +6,7 @@ public interface ISecurityService
 {
     Task<Result<List<Security>>> GetSecuritiesAsync();
 
-    Task<Result<int?>> GetSecurityIdAsync(string securityName);
+    Task<Result<int>> GetSecurityIdAsync(string securityName);
 
-    Task<Result<Security?>> GetSecurityAsync(int id);
+    Task<Result<Security>> GetSecurityAsync(int id);
 }

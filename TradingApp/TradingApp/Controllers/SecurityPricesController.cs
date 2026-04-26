@@ -19,6 +19,10 @@ namespace TradingApp.Controllers
             _securityPricesHelper = securityPricesHelper;
         }
 
+        /// <summary>
+        /// Retrieves latest prices for all securities
+        /// </summary>
+        /// <returns>Latest prices for all securities</returns>
         [HttpGet]
         [ProducesResponseType(typeof(List<SecurityPriceDto>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetSecurityPrices()

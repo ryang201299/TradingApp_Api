@@ -34,10 +34,12 @@ public class SecurityService : ISecurityService
         }
     }
 
-    public async Task<Result<int?>> GetSecurityIdAsync(string securityName)
+    public async Task<Result<int>> GetSecurityIdAsync(string securityName)
     {
         try
         {
+            _logger.LogInformation("Retrieving security `{SecurityName}`.", securityName);
+
             int? securityId = await _context.Securities
                 .Where(x => x.SecurityName == securityName)
                 .Select(x => x.SecurityId).FirstOrDefaultAsync();
@@ -45,35 +47,42 @@ public class SecurityService : ISecurityService
             if (securityId == null)
             {
                 _logger.LogInformation("Security `{SecurityName}` not found.", securityName);
-            }
-            else
-            {
-                _logger.LogInformation("Retrieved security id `{SecurityId}` from name `{SecurityName}`.", securityId, securityName);
+                return Result<int>.Failure("Security not found.");
             }
 
-            return Result<int?>.Success(securityId);
+            _logger.LogInformation("Retrieved security id `{SecurityId}` from name `{SecurityName}`.", securityId, securityName);
+
+            return Result<int>.Success((int)securityId);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "An error occurred while retrieving security Id given name `{Name}`.", securityName);
-            return Result<int?>.Failure(ex.Message);
+            return Result<int>.Failure(ex.Message);
         }
     }
 
-    public async Task<Result<Security?>> GetSecurityAsync(int id)
+    public async Task<Result<Security>> GetSecurityAsync(int id)
     {
         try
         {
+            _logger.LogInformation("Getting security `{SecurityId}.`", id);
+
             Security? security = await _context.Securities
                 .Where(x => x.SecurityId == id)
                 .FirstOrDefaultAsync();
 
-            return Result<Security?>.Success(security);
+            if (security == null)
+            {
+                _logger.LogError("Security not found.");
+                return Result<Security>.Failure("Security not found.");
+            }
+
+            return Result<Security>.Success(security);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "An error occurred while retrieving security `{SecurityId}`.", id);
-            return Result<Security?>.Failure(ex.Message);
+            return Result<Security>.Failure(ex.Message);
         }
     }
 }

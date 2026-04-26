@@ -1,5 +1,9 @@
 ﻿namespace TradingApp.Models.Interfaces.ControllerHelpers;
 public interface IHoldingsControllerHelper
 {
-    Task<List<HoldingsPerAccount>> GetHoldingsAsync();
+    /// <summary>
+    /// Retrieves overall holdings value per account
+    /// </summary>
+    /// <returns>Overall holdings value for all accounts</returns>
+    Task<Result<List<HoldingsPerAccount>>> GetHoldingsAsync();
 }

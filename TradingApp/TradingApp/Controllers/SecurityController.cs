@@ -19,6 +19,10 @@ public class SecurityController : ControllerBase
         _securityHelper = securityHelper;
     }
 
+    /// <summary>
+    /// Retrieves a list of all securities
+    /// </summary>
+    /// <returns>A list of all securities</returns>
     [HttpGet]
     [ProducesResponseType(typeof(List<SecurityDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetSecurities()
@@ -47,6 +51,11 @@ public class SecurityController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Retrieves a security Id given it's name
+    /// </summary>
+    /// <param name="name">Security name</param>
+    /// <returns>Security Id</returns>
     [HttpGet("{name}/id")]
     [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -54,20 +63,14 @@ public class SecurityController : ControllerBase
     {
         try
         {
-            Result<int?> securityId = await _securityHelper.GetSecurityIdAsync(name);
+            Result<int> securityId = await _securityHelper.GetSecurityIdAsync(name);
 
             if (!securityId.IsSuccess)
             {
                 return BadRequest(securityId.Error);
             }
 
-            if (securityId.Value == null)
-            {
-                return NotFound();
-            }
-
             return Ok(securityId.Value);
-
         }
         catch (Exception ex)
         {

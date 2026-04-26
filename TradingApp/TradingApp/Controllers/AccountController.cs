@@ -65,21 +65,16 @@ public class AccountController : ControllerBase
     {
         try
         {
-            Result<Account?> accountResult = await _accountHelper.GetAccountAsync(id);
+            Result<Account> accountResult = await _accountHelper.GetAccountAsync(id);
 
             if (!accountResult.IsSuccess)
             {
                 return BadRequest(accountResult.Error);
             }
 
-            if (accountResult.Value == null)
-            {
-                return NotFound();
-            }
-
             return Ok(new AccountDto()
             {
-                AccountId = accountResult.Value.AccountId,
+                AccountId = accountResult.Value!.AccountId,
                 Name = accountResult.Value.Name,
                 Cash = accountResult.Value.Cash
             });
@@ -92,6 +87,11 @@ public class AccountController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Gets an accounts id given it's name
+    /// </summary>
+    /// <param name="name">Name of the account</param>
+    /// <returns>Account Id</returns>
     [HttpGet("{name}/id")]
     [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -99,16 +99,11 @@ public class AccountController : ControllerBase
     {
         try
         {
-            Result<int?> accountId = await _accountHelper.GetAccountIdAsync(name);
+            Result<int> accountId = await _accountHelper.GetAccountIdAsync(name);
 
             if (!accountId.IsSuccess)
             {
                 return BadRequest(accountId.Error);
-            }
-
-            if (accountId.Value == null)
-            {
-                return NotFound();
             }
 
             return Ok(accountId.Value);

@@ -6,5 +6,5 @@ namespace TradingApp.Helpers.Services;
 
 public interface ITransactionTypeService
 {
-    Task<Result<TransactionType?>> GetTransactionTypeAsync(TransactionTypeEnum transactionType);
+    Task<Result<TransactionType>> GetTransactionTypeAsync(TransactionTypeEnum transactionType);
 }

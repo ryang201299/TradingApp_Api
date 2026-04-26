@@ -6,5 +6,5 @@ public interface ISecurityControllerHelper
 {
     Task<Result<List<Security>>> GetSecuritiesAsync();
 
-    Task<Result<int?>> GetSecurityIdAsync(string name);
+    Task<Result<int>> GetSecurityIdAsync(string name);
 }
